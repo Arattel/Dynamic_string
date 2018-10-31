@@ -560,6 +560,19 @@ int my_str_read(my_str_t* str) {
     return EXIT_SUCCESS;
 
 }
+//! Збільшує буфер стрічки, із збереженням вмісту,
+//! якщо новий розмір більший за попередній,
+//! не робить нічого, якщо менший або рівний.
+//! (Як показує практика, це -- корисний підхід).
+//! Для збільшення виділяє новий буфер, копіює вміст
+//! стрічки (size_m символів -- немає сенсу копіювати
+//! решту буфера) із старого буфера та звільняє його.
+int my_str_reserve(my_str_t* str, size_t buf_size){
+    if(str->capacity_m < buf_size){
+        str->capacity_m = buf_size;
+        str->data = (char *)realloc(str->data, buf_size);
+    }
+}
 
 //int main(int* argc, char* argv[]) {
 
