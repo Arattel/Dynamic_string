@@ -573,6 +573,10 @@ int my_str_reserve(my_str_t* str, size_t buf_size){
         str->data = (char *)realloc(str->data, buf_size);
     }
 }
+int my_str_shrink_to_fit(my_str_t* str){
+    str->capacity_m = str->size_m;
+    str->data = (char *)realloc(str->data, str->size_m);
+}
 
 //int main(int* argc, char* argv[]) {
 
