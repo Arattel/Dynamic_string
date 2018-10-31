@@ -577,7 +577,30 @@ int my_str_shrink_to_fit(my_str_t* str){
     str->capacity_m = str->size_m;
     str->data = (char *)realloc(str->data, str->size_m);
 }
-
+//! Якщо new_size менший за поточний розмір -- просто
+//! відкидає зайві символи (зменшуючи size_m). Якщо
+//! більший -- збільшує фактичний розмір стрічки,
+//! встановлюючи нові символи рівними sym.
+//! За потреби, збільшує буфер.
+//! Сподіваюся, різниця між розміром буфера та фактичним
+//! розміром стрічки зрозуміла?
+int my_str_resize(my_str_t* str, size_t new_size, char sym){
+    printf("New size, size before : %zu, %zu", new_size, str->size_m);
+    if(new_size < str->size_m){
+        while(new_size < str->size_m){
+            my_str_popback(str);
+        }
+    } else if(new_size > str->size_m){
+        if(new_size > str->capacity_m){
+            my_str_reserve(str, new_size + 1);
+        }
+        size_t number_of_chars = new_size - str->size_m;
+        for(int i = 0; i <= number_of_chars; i++){
+            my_str_pushback(str, sym);
+        }
+    }
+    return 0;
+}
 //int main(int* argc, char* argv[]) {
 
 //  tesr read file

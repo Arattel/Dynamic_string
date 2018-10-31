@@ -49,4 +49,5 @@ int my_str_read_file(my_str_t* str, FILE* file);
 int my_str_read(my_str_t* str);
 int my_str_reserve(my_str_t* str, size_t buf_size);
 int my_str_shrink_to_fit(my_str_t* str);
+int my_str_resize(my_str_t* str, size_t new_size, char sym);
 #endif //MY_STRING_STRING_H
