@@ -1,0 +1,31 @@
+to build shared library using cmake you should enter the next commands in terminal:
+1)../library$ mkdir <build folder> && cd <build folder>
+
+f. e.
+../library$ mkdir build && cd build
+
+2)../library/<build folder>$ cmake .. && make
+
+f. e.
+..library/build$ cmake .. && make
+# output is
+-- The C compiler identification is GNU 7.3.0
+-- Check for working C compiler: /usr/bin/cc
+-- Check for working C compiler: /usr/bin/cc -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /mnt/c/Users/3naza/OneDrive/Documents/poc/labs/my_string/library/build
+Scanning dependencies of target _my_string
+[ 50%] Building C object CMakeFiles/_my_string.dir/my_string.c.o
+[100%] Linking C shared library lib_my_string.so
+[100%] Built target _my_string
+
+3)../library/<build folder>$ cd ..
+
+now, library lib_my_string.so is stored in ../library/bin/
+    and you can use it in your programs using
+    #include "my_string.h"

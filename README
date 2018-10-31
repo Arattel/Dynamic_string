@@ -1,0 +1,3 @@
+There are three CMakeLists.txt-files for each directory,
+so you should build them separately; there also README's
+for each of them with examples and instructions how to use programs
