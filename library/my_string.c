@@ -136,7 +136,7 @@ int my_str_append_cstr(my_str_t *str, char *from) {
 
     if (str->capacity_m - str->size_m < str_len(from)) return EXIT_FAILURE;
 
-    while(*from){
+    while (*from) {
         my_str_pushback(str, *from++);
     }
     return EXIT_SUCCESS;
@@ -179,7 +179,7 @@ int my_str_substr(const my_str_t *str, my_str_t *to, size_t beg, size_t end_s) {
     }
 }
 
-void getZarr(char str[], size_t* Z, size_t n) {
+void getZarr(char str[], size_t *Z, size_t n) {
 //    size_t n = str_len(str);
     size_t L, R, k;
 
@@ -252,7 +252,7 @@ size_t my_str_find(const my_str_t *str, const my_str_t *tofind, size_t from) {
     getZarr(text, Z, l);
 
 //    printf("\nZ is: [ ");
-    for (size_t i = 0; i < l; i++){
+    for (size_t i = 0; i < l; i++) {
 //        printf("%zu ", Z[i]);
     }
 //    printf("]\n");
@@ -269,7 +269,7 @@ size_t my_str_find(const my_str_t *str, const my_str_t *tofind, size_t from) {
 
 }
 
-char* my_str_getdata(my_str_t *str) {
+char *my_str_getdata(my_str_t *str) {
 //    return str->data;
     if (str->size_m) return str->data;
     return NULL;
@@ -454,7 +454,7 @@ int my_str_append(my_str_t *str, my_str_t *from) {
     if (str->capacity_m - str->size_m < from->size_m) return EXIT_FAILURE;
 
     size_t i = 0;
-    while(from->data[i]) {
+    while (from->data[i]) {
         my_str_pushback(str, from->data[i++]);
 //        str->data[str->size_m + i + 1] = from->data[i];
 //        str->size_m++;
@@ -497,12 +497,12 @@ const char *my_str_get_cstr(my_str_t *str) {
 //! Знайти перший символ в стрічці, повернути його номер
 //! або -1u, якщо не знайдено. from -- місце, з якого починати шукати.
 //! Якщо більше за розмір -- вважати, що не знайдено.
-size_t my_str_find_c(const my_str_t* str, char tofind, size_t from){
-    if(from >= str->size_m){
+size_t my_str_find_c(const my_str_t *str, char tofind, size_t from) {
+    if (from >= str->size_m) {
         return (size_t) -1u;
-    } else{
-        for(size_t i = from; i < str->size_m; i++){
-            if(str->data[i] == tofind){
+    } else {
+        for (size_t i = from; i < str->size_m; i++) {
+            if (str->data[i] == tofind) {
                 return i;
             }
         }
@@ -513,9 +513,9 @@ size_t my_str_find_c(const my_str_t* str, char tofind, size_t from){
 //! Знайти символ в стрічці, для якого передана
 //! функція повернула true, повернути його номер
 //! або -1u, якщо не знайдено:
-size_t my_str_find_if(const my_str_t* str, int (*predicat)(char)){
-    for(size_t i = 0; i < str->size_m; i++){
-        if((*predicat)(str->data[i])){
+size_t my_str_find_if(const my_str_t *str, int (*predicat)(char)) {
+    for (size_t i = 0; i < str->size_m; i++) {
+        if ((*predicat)(str->data[i])) {
             return i;
         }
     }
@@ -526,7 +526,7 @@ size_t my_str_find_if(const my_str_t* str, int (*predicat)(char)){
 //! якщо сталися помилки. Кінець вводу -- не помилка, однак,
 //! слід не давати читанню вийти за межі буфера!
 //! Рекомендую скористатися fgets().
-int my_str_read_file(my_str_t* str, FILE* file) {
+int my_str_read_file(my_str_t *str, FILE *file) {
 
     if (!file) return EXIT_FAILURE;
 
@@ -546,7 +546,7 @@ int my_str_read_file(my_str_t* str, FILE* file) {
 }
 
 //! Аналог my_str_read_file, із stdin
-int my_str_read(my_str_t* str) {
+int my_str_read(my_str_t *str) {
 
     my_str_create(str, 2000);
     char read_cstr[2000];
@@ -560,6 +560,7 @@ int my_str_read(my_str_t* str) {
     return EXIT_SUCCESS;
 
 }
+
 //! Збільшує буфер стрічки, із збереженням вмісту,
 //! якщо новий розмір більший за попередній,
 //! не робить нічого, якщо менший або рівний.
@@ -567,16 +568,34 @@ int my_str_read(my_str_t* str) {
 //! Для збільшення виділяє новий буфер, копіює вміст
 //! стрічки (size_m символів -- немає сенсу копіювати
 //! решту буфера) із старого буфера та звільняє його.
-int my_str_reserve(my_str_t* str, size_t buf_size){
-    if(str->capacity_m < buf_size){
+int my_str_reserve(my_str_t *str, size_t buf_size) {
+    if (str->capacity_m < buf_size) {
         str->capacity_m = buf_size;
-        str->data = (char *)realloc(str->data, buf_size);
+        char *allocatedMemory = malloc(buf_size + 1);
+        for (size_t j = 0; j < buf_size + 1; ++j) {
+            allocatedMemory[j] =  '\0';
+        }
+        for (size_t i = 0; i < str->size_m; i++) {
+            allocatedMemory[i] = str->data[i];
+        }
+        free(str->data);
+        str->data = allocatedMemory;
     }
 }
-int my_str_shrink_to_fit(my_str_t* str){
+
+int my_str_shrink_to_fit(my_str_t *str) {
     str->capacity_m = str->size_m;
-    str->data = (char *)realloc(str->data, str->size_m);
+    char * allocatedMemory = malloc(str->size_m + 1);
+    for(size_t i  = 0; i < str->size_m + 1; i++){
+        allocatedMemory[i] = '\0';
+    }
+    for(int j = 0; j < str->size_m; j++){
+        allocatedMemory[j] = str->data[j];
+    }
+    my_str_free(str);
+    str->data = allocatedMemory;
 }
+
 //! Якщо new_size менший за поточний розмір -- просто
 //! відкидає зайві символи (зменшуючи size_m). Якщо
 //! більший -- збільшує фактичний розмір стрічки,
@@ -584,18 +603,18 @@ int my_str_shrink_to_fit(my_str_t* str){
 //! За потреби, збільшує буфер.
 //! Сподіваюся, різниця між розміром буфера та фактичним
 //! розміром стрічки зрозуміла?
-int my_str_resize(my_str_t* str, size_t new_size, char sym){
+int my_str_resize(my_str_t *str, size_t new_size, char sym) {
     printf("New size, size before : %zu, %zu", new_size, str->size_m);
-    if(new_size < str->size_m){
-        while(new_size < str->size_m){
+    if (new_size < str->size_m) {
+        while (new_size < str->size_m) {
             my_str_popback(str);
         }
-    } else if(new_size > str->size_m){
-        if(new_size > str->capacity_m){
+    } else if (new_size > str->size_m) {
+        if (new_size > str->capacity_m) {
             my_str_reserve(str, new_size + 1);
         }
         size_t number_of_chars = new_size - str->size_m;
-        for(int i = 0; i <= number_of_chars; i++){
+        for (int i = 0; i <= number_of_chars; i++) {
             my_str_pushback(str, sym);
         }
     }
