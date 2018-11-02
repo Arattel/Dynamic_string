@@ -19,7 +19,7 @@ char *str_copy(char *destination, char *source);
 size_t str_len(const char *str);
 char *str_cat(char *dest_ptr, const char *src_ptr);
 int my_str_empty(const my_str_t *str);
-int my_str_from_cstr(my_str_t *str, char *cstr, size_t buf_size);
+int my_str_from_cstr(my_str_t *str, const char *cstr);
 int my_str_create(my_str_t *str, size_t buf_size);
 size_t my_str_size(const my_str_t *str);
 void my_str_free(my_str_t *str);

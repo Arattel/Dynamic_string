@@ -56,35 +56,18 @@ int my_str_empty(const my_str_t *str) {
     return (str->size_m) ? 0 : 1;
 }
 
-//! Створити стрічку із буфером вказаного розміру із переданої С-стрічки.
-//! Якщо розмір -- 0, виділяє блок, рівний розміру С-стрічки, якщо
-//! менший за її розмір -- вважати помилкою.
-//! Пам'ять виділяється динамічно.
-//! 0 -- якщо все ОК, -1 -- недостатній розмір буфера, -2 -- не вдалося виділити пам'ять
-int my_str_from_cstr(my_str_t *str, char *cstr, size_t buf_size) {
 
-    if (str) {
-        char *allocatedMemory;
-        if (!buf_size) {
-            allocatedMemory = malloc(str_len(cstr));
-        } else if (buf_size >= str_len(cstr)) {
-            allocatedMemory = malloc(buf_size + 1);
-        } else {
-            return EXIT_FAILURE;
-        }
-        if (allocatedMemory) {
-            str->data = allocatedMemory;
-            str->capacity_m = buf_size ? buf_size : str_len(cstr);
-            str->size_m = str_len(cstr);
-            size_t i = 0;
-
-            str_copy(str->data, cstr);
-
-            return EXIT_SUCCESS;
-        }
-
-        return EXIT_FAILURE;
+int my_str_from_cstr(my_str_t *str, const char *cstr) {
+    str->size_m = str_len(cstr);
+    str->capacity_m = str->size_m + 1;
+    str->data = malloc(str->capacity_m);
+    for(size_t i = 0; i < str->capacity_m; i++){
+        str->data[i] = '\0';
     }
+    for(size_t j = 0; j < str->size_m; j++){
+        str->data[j] = cstr[j];
+    }
+    return 0;
 }
 
 //! Створити стрічку із буфером вказаного розміру. Пам'ять виділяється динамічно.
@@ -96,12 +79,14 @@ int my_str_create(my_str_t *str, size_t buf_size) {
             str->data = allocatedMemory;
             str->capacity_m = buf_size;
             str->size_m = 0;
-            str->data[0] = '\0';
+            for(size_t i = 0; i < buf_size + 1; i++){
+                str->data[i] = '\0';
+            }
+        }
             return EXIT_SUCCESS;
         }
-    }
     return EXIT_FAILURE;
-}
+    }
 
 //! Повертає розмір стрічки:
 size_t my_str_size(const my_str_t *str) {
@@ -121,20 +106,21 @@ size_t my_str_capacity(const my_str_t *str) {
 //! Повертає 0, якщо успішно, -1, якщо буфер закінчився.
 int my_str_pushback(my_str_t *str, char c) {
     if ((str->size_m + 2) > str->capacity_m) {
-        return EXIT_FAILURE;
-    } else {
+        my_str_reserve(str, str->capacity_m * 2);
+    }
         str->data[str->size_m] = c;
         str->data[str->size_m + 1] = '\0';
         str->size_m++;
         return EXIT_SUCCESS;
     }
-}
 
 //! Додати С-стрічку в кінець.
 //! Якщо це неможливо, повертає -1, інакше 0.
 int my_str_append_cstr(my_str_t *str, char *from) {
 
-    if (str->capacity_m - str->size_m < str_len(from)) return EXIT_FAILURE;
+    if (str->capacity_m - str->size_m < str_len(from)){
+        my_str_reserve(str, str->capacity_m * 2);
+    }
 
     while (*from) {
         my_str_pushback(str, *from++);
@@ -330,43 +316,41 @@ void my_str_print(const my_str_t *str) {
 }
 
 int my_str_copy(const my_str_t *from, my_str_t *to, int reserve) {
-    if (from->size_m) {
-        if (reserve) {
-            my_str_create(to, from->capacity_m);
-        } else {
-            my_str_create(to, from->size_m);
+    size_t buffer_size = from->size_m;
+    if(reserve){buffer_size *= 2;}
+    if(to->capacity_m < from->size_m){
+        while(to->capacity_m < from->size_m){
+            my_str_reserve(to, buffer_size);
         }
-        for (size_t i = 0; i < from->size_m; i++) {
-            my_str_pushback(to, from->data[i]);
-        }
-
-        to->data[from->size_m + 1] = '\0';
-
-        return EXIT_SUCCESS;
     }
-    return EXIT_FAILURE;
+    for(size_t i = 0; i < to->capacity_m; i++){
+        to->data[i] = '\0';
+    }
+    for(size_t j = 0; j < from->size_m; j++){
+        to->data[j] = from->data[j];
+    }
+    to->size_m = from->size_m;
+    return EXIT_SUCCESS;
 }
 
 //! Вставити символ у стрічку в заданій позиції, змістивши решту символів праворуч.
 //! Якщо це неможливо, повертає -1, інакше 0.
 int my_str_insert_c(my_str_t *str, char c, size_t pos) {
-    if (pos > str->size_m || pos >= str->capacity_m || (str->size_m + 1) > str->capacity_m) {
+    if (pos > str->size_m) {
         return -1;
     } else {
-        if (pos == str->size_m) {
-            str->data[str->size_m] = c;
-            str->data[str->size_m + 1] = '\0';
-        } else {
-            size_t i = (str->size_m);
-            while (i-- > pos) {
-                str->data[i + 1] = str->data[i];
-            }
+        if((str->size_m + 1) > str->capacity_m){
+            my_str_reserve(str, str->capacity_m * 2);
+        }
+        size_t i = (str->size_m);
+        while (i-- > pos) {
+            str->data[i + 1] = str->data[i];
+        }
             str->data[pos] = c;
             str->size_m++;
         }
         return 0;
     }
-}
 
 void move_on(my_str_t *str, size_t start_pos, size_t gap) {
     size_t old_size = str->size_m;
@@ -623,133 +607,3 @@ int my_str_resize (my_str_t *str, size_t new_size, char sym) {
     }
     return 0;
 }
-//int main(int* argc, char* argv[]) {
-
-//  tesr read file
-//    FILE* inp_file = fopen(argv[1], "r");
-//    my_str_t file_str;
-//    my_str_read_file(&file_str, inp_file);
-//    printf("\n%s\n", my_str_getdata(&file_str));
-
-//test read
-//    my_str_t read_str;
-//    my_str_read(&read_str);
-//    printf("\n%s\n", my_str_getdata(&read_str));
-
-
-////
-//    my_str_t test_str;
-//    my_str_create(&test_str, 200);
-//    my_str_from_cstr(&test_str, "afkafk", 200);
-
-//    my_str_t test_str2;
-//    my_str_create(&test_str2, 100);
-//    my_str_substr(&test_str, &test_str2, 1, 3);
-//    my_str_pushback(&test_str, 'a');
-//    my_str_pushback(&test_str, 'f');
-//    my_str_pushback(&test_str, 'k');
-//    my_str_t test1;
-//    my_str_create(&test1, 120);
-//    my_str_pushback(&test1, 'x');
-//    my_str_pushback(&test1, 'y');
-//    my_str_pushback(&test1, 'z');
-//    my_str_append(&test_str2, &test1);
-//    printf("res: %s\n", test_str2.data);
-
-//    my_str_substr(&test_str, &test1, 2, 38);
-//    char *str = my_str_get_cstr(&test_str);
-//    printf("%i\n", strlen(str));
-//    printf("%s\n", str);
-//    print(&test1)
-//
-//    printf("Hello, World!\n");
-//    printf("Hello, World!\n");
-//    char cstr[] = "hello";
-//    my_str_t this;
-//
-////    test cstr to str
-//    printf("\ntest cstr to str\n");
-//    my_str_from_cstr(&this, cstr, 30);
-//    printf("%s\n", this.data);
-//    printf("%zu\n", this.size_m);
-//    printf("%zu\n", this.capacity_m);
-//
-//    printf("\nTest pushback: \n");
-//    printf("\nBefore: %s\n", this.data);
-//    my_str_pushback(&this, ',');
-//    printf("\nAfter: %s\n", this.data);
-//
-//    printf("\nTest pohback: \n");
-//    printf("\nBefore: %s\n", this.data);
-//    my_str_popback(&this);
-//    printf("\nAfter: %s\n", this.data);
-//
-//    char cstr2[] = ", world";
-//
-////    test append cstr
-//    printf("\ntest append cstr\n");
-//    my_str_append_cstr(&this, cstr2);
-//    printf("new %s\n", this.data);
-//    printf("%zu\n", this.size_m);
-//    printf("%zu", this.capacity_m);
-//
-////    test copy
-//    printf("\ntest copy\n");
-//    char try_copy[] = "try copy! 123";
-//    char to_copy[30];
-//    str_copy(to_copy, try_copy);
-//    printf("%s", to_copy);
-//
-////    test cat
-//    printf("\ntest cat\n");
-//    char yes[] = " yes";
-//    char *after_cat[30];
-//    *after_cat = str_cat(to_copy, yes);
-//    printf("%s", *after_cat);
-//
-//    test find substring
-//    printf("\ntest find substring\n");
-//    my_str_t to_find;
-//    my_str_from_cstr(&to_find, ".txt", 30);
-//    my_str_t num;
-//    my_str_from_cstr(&num, "sample.txt", 30);
-//    my_str_append_cstr(&num, "lak");
-//    my_str_popback(&num);
-//    printf("search %s in %s\n", to_find.data, num.data);
-//    printf("%zu", my_str_find(&num, &to_find, 0));
-
-//
-////    test get substring
-//    printf("\ntest get substring\n");
-//    my_str_t substr;
-//    my_str_create(&substr, 30);
-//    printf("\nbefore: %s", substr.data);
-//    my_str_substr(&this, &substr, 6, this.size_m);
-//    printf("\nafter: %s\n", substr.data);
-//
-//
-//    printf("\nTest find:\n");
-//    my_str_t test_str;
-//    my_str_create(&test_str, 20);
-//    my_str_pushback(&test_str, '2');
-//    my_str_pushback(&test_str, '1');
-//    my_str_pushback(&test_str, '0');
-//    my_str_pushback(&test_str, '1');
-//    printf("Our string: %s\n", test_str.data);
-//    printf("Index of 1, beginning with 0: %zu\n", my_str_find_c(&test_str, '1', 0));
-//    printf("Index of 1, beginning with 2: %zu\n", my_str_find_c(&test_str, '1', 2));
-//    printf("Index of 8, beginning with 0: %zu\n", my_str_find_c(&test_str, '8', 0));
-//    printf("\nTest find if:\n");
-//    printf("Our string: %s\n", test_str.data);
-//    printf("Index of first symbol that is either 1 or 8: %zu", my_str_find_if(&test_str, &test_function_for_chars));
-////    test pop
-//    printf("\ntest pop\n");
-//    my_str_t new_this;
-//    my_str_from_cstr(&new_this, "12345", 20);
-//    printf("Before: %s\n", new_this.data);
-//    printf("Char deleted: %c\n",(char)my_str_popback(&new_this));
-//    printf("After: %s\n", new_this.data);
-//
-//    return 0;
-//}
-
