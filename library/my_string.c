@@ -556,8 +556,8 @@ int my_str_reserve(my_str_t *str, size_t buf_size) {
     if (str->capacity_m < buf_size) {
         str->capacity_m = buf_size;
         char *allocatedMemory = malloc(buf_size + 1);
-        for (size_t j = 0; j < buf_size + 1; ++j) {
-            allocatedMemory[j] =  '\0';
+        if (!allocatedMemory){
+            return -1;
         }
         for (size_t i = 0; i < str->size_m; i++) {
             allocatedMemory[i] = str->data[i];
@@ -565,6 +565,7 @@ int my_str_reserve(my_str_t *str, size_t buf_size) {
         free(str->data);
         str->data = allocatedMemory;
     }
+    return 0;
 }
 
 int my_str_shrink_to_fit(my_str_t *str) {
