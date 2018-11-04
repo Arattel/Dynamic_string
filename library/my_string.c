@@ -530,7 +530,7 @@ int my_str_read_file(my_str_t *str, FILE *file) {
 }
 
 //! Аналог my_str_read_file, із stdin
-int my_str_read(my_str_t *str) {
+int my_str_read (my_str_t *str) {
 
     my_str_create(str, 2000);
     char read_cstr[2000];
@@ -552,7 +552,7 @@ int my_str_read(my_str_t *str) {
 //! Для збільшення виділяє новий буфер, копіює вміст
 //! стрічки (size_m символів -- немає сенсу копіювати
 //! решту буфера) із старого буфера та звільняє його.
-int my_str_reserve(my_str_t *str, size_t buf_size) {
+int my_str_reserve (my_str_t *str, size_t buf_size) {
     if (str->capacity_m < buf_size) {
         str->capacity_m = buf_size;
         char *allocatedMemory = malloc(buf_size + 1);
@@ -562,23 +562,25 @@ int my_str_reserve(my_str_t *str, size_t buf_size) {
         for (size_t i = 0; i < str->size_m; i++) {
             allocatedMemory[i] = str->data[i];
         }
-        free(str->data);
+        free (str->data);
         str->data = allocatedMemory;
+        return EXIT_SUCCESS;
     }
     return 0;
 }
 
-int my_str_shrink_to_fit(my_str_t *str) {
+int my_str_shrink_to_fit (my_str_t *str) {
     str->capacity_m = str->size_m;
     char * allocatedMemory = malloc(str->size_m + 1);
-    for(size_t i  = 0; i < str->size_m + 1; i++){
+    for (size_t i  = 0; i < str->size_m + 1; i++) {
         allocatedMemory[i] = '\0';
     }
-    for(int j = 0; j < str->size_m; j++){
+    for (int j = 0; j < str->size_m; j++) {
         allocatedMemory[j] = str->data[j];
     }
     my_str_free(str);
     str->data = allocatedMemory;
+    return EXIT_SUCCESS;
 }
 
 //! Якщо new_size менший за поточний розмір -- просто
@@ -588,7 +590,7 @@ int my_str_shrink_to_fit(my_str_t *str) {
 //! За потреби, збільшує буфер.
 //! Сподіваюся, різниця між розміром буфера та фактичним
 //! розміром стрічки зрозуміла?
-int my_str_resize(my_str_t *str, size_t new_size, char sym) {
+int my_str_resize (my_str_t *str, size_t new_size, char sym) {
     printf("New size, size before : %zu, %zu", new_size, str->size_m);
     if (new_size < str->size_m) {
         while (new_size < str->size_m) {
