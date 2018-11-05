@@ -575,7 +575,7 @@ int my_str_shrink_to_fit (my_str_t *str) {
     for (size_t i  = 0; i < str->size_m + 1; i++) {
         allocatedMemory[i] = '\0';
     }
-    for (int j = 0; j < str->size_m; j++) {
+    for (size_t j = 0; j < str->size_m; j++) {
         allocatedMemory[j] = str->data[j];
     }
     my_str_free(str);
@@ -601,7 +601,7 @@ int my_str_resize (my_str_t *str, size_t new_size, char sym) {
             my_str_reserve(str, new_size + 1);
         }
         size_t number_of_chars = new_size - str->size_m;
-        for (int i = 0; i <= number_of_chars; i++) {
+        for (size_t i = 0; i <= number_of_chars; i++) {
             my_str_pushback(str, sym);
         }
     }
