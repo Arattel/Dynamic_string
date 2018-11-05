@@ -4,7 +4,7 @@
 #include "my_string.h"
 #include <stdio.h>
 
-void main(int* argc, char* argv[]) {
+int main(int argc, char* argv[]) {
     my_str_t a;
     my_str_from_cstr(&a, "Hello world");
     printf("\nMy str:\"%s\"\n", my_str_getdata(&a));
@@ -29,4 +29,9 @@ void main(int* argc, char* argv[]) {
     printf("B: %s, %zu", b.data, b.capacity_m);
     my_str_append_cstr(&b, "alfa");
     printf("B: %s, %zu", b.data, b.capacity_m);
+    my_str_free(&a);
+    my_str_free(&b);
+
+    return 0;
 }
+
