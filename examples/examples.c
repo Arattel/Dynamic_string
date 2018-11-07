@@ -5,15 +5,44 @@
 #include <stdio.h>
 
 void main(int* argc, char* argv[]) {
-
     // Example of type casting
+    my_str_t a;
+    my_str_t b;
+    // Example creation from C-string
+    my_str_from_cstr(&a, "Hello world");
+    printf("\nMy str:\"%s\"\n", my_str_getdata(&a));
+    printf("Buffer_size: %zu\n", my_str_capacity(&a));
+    // Example of increasing reserve
+    printf("\nIncreasing reserve\n");
+    printf("Reserve before: %zu\n", my_str_capacity(&a));
+    my_str_reserve(&a, 39);
+    printf("Reserve after: %zu\n", my_str_capacity(&a));
+    // Example of string creation
+    my_str_create(&b, 7);
+    // Example of copying
+    my_str_copy(&a, &b, 0);
+    // Example of shrink
+    printf("\nShrinking\n");
+    printf("Buffer_size before: %zu\n", my_str_capacity(&a));
+    my_str_shrink_to_fit(&a);
+    printf("Buffer_size: %zu\n", my_str_capacity(&a));
+    // Example of resize
+    printf("\nResize\n");
+    printf("Before resize: %s", my_str_getdata(&a));
+    my_str_resize(&a, 38, 'n');
+    printf("After resize: %s", my_str_getdata(&a));
+    my_str_shrink_to_fit(&b);
+    printf("B: %s, %zu", b.data, b.capacity_m);
+    my_str_pushback(&b, 'f');
+    printf("B: %s, %zu", b.data, b.capacity_m);
+    // Example of appending C-string
+    my_str_free(&a);
+    my_str_free(&b);
+
     my_str_t test_string0;
 
-    // Example of my_str_t creation
-    my_str_create(&test_string0, 38);
-
     //Example of pushback function
-    printf("Before pushback: %s", my_str_getcstr(&test_string0));
+    printf("Before pushback: %s", my_str_get_cstr(&test_string0));
     my_str_pushback(&test_string0, '1');
     printf("\nPushback");
     printf("\nResult: \"%s\" \n", my_str_getdata(&test_string0));
@@ -30,7 +59,7 @@ void main(int* argc, char* argv[]) {
     printf("\nCreation my_str_t from c-string\n");
     my_str_t test_string1;
     printf("Should be \"Hello word\"");
-    my_str_from_cstr(&test_string1, "Hello world", 38);
+    my_str_from_cstr(&test_string1, "Hello world");
     printf("Result: \"%s\"\n", my_str_getdata(&test_string1));
     printf("Length: %ld\n", my_str_size(&test_string1));
 
@@ -143,7 +172,7 @@ void main(int* argc, char* argv[]) {
     my_str_t test_string4;
 
     char * string0  = "honest";
-    my_str_from_cstr(&test_string4, "gravel", 38);
+    my_str_from_cstr(&test_string4, "gravel");
     printf("Our strings to compare : \"%s\", \"%s\"\n", my_str_getdata(&test_string4), string0);
     printf("Result: %d\n", my_str_cmp(&test_string4, string0));
 
